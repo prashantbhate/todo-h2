@@ -1,0 +1,21 @@
+<html>
+<head>
+
+    <script type="text/javascript">
+        function getTodos(){
+            var requestOptions = {
+                method: 'GET',
+                redirect: 'follow'
+            };
+
+            fetch("http://localhost:8080/todos", requestOptions)
+                .then(response => response.text())
+                .then(result => console.log(result))
+                .catch(error => console.log('error', error));
+        }
+    </script>
+</head>
+<body>
+<button onclick="getTodos()">Click</button>
+</body>
+</html>
