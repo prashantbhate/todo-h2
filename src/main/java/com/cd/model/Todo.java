@@ -28,6 +28,9 @@ public class Todo {
     @NotBlank (message = "User cannot be null or empty!")
     private String user;
 
+    @Size(min = 4, max = 10, message = "Title should be 4 to 10")
+    private String title;
+
     @Size(min = 10, max = 200, message = "Task should be b/w 10-200 characters!")
     private String task;
     private boolean done;
