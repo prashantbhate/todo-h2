@@ -21,7 +21,7 @@ public class TodoControllerAdvice {
 
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
     @ExceptionHandler
-    public ResponseEntity handleException(TodoNotFoundException ex){
+    public ResponseEntity handleException(TodoNotFoundException ex) {
         logException(ex);
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorCode("Todo-404");
@@ -32,7 +32,7 @@ public class TodoControllerAdvice {
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler
-    public ResponseEntity handleException(TodoIDMismatchException ex){
+    public ResponseEntity handleException(TodoIDMismatchException ex) {
         logException(ex);
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorCode("Todo-400");
@@ -43,7 +43,7 @@ public class TodoControllerAdvice {
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler
-    public ResponseEntity handleException(MethodArgumentNotValidException ex){
+    public ResponseEntity handleException(MethodArgumentNotValidException ex) {
         logException(ex);
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorCode("Todo-400");
@@ -52,8 +52,9 @@ public class TodoControllerAdvice {
         errorResponse.setFieldErrors(ex.getFieldErrors());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
     @ExceptionHandler
-    public ResponseEntity handleException(Exception ex){
+    public ResponseEntity handleException(Exception ex) {
         logException(ex);
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorCode("Todo-500");

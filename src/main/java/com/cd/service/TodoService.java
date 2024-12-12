@@ -20,24 +20,20 @@ public class TodoService {
         return todoRepository.findAll();
     }
 
-    public Todo getTodoById(UUID id)
-    {
-         return   todoRepository.findById(id).orElseThrow(TodoNotFoundException::new);
+    public Todo getTodoById(UUID id) {
+        return todoRepository.findById(id).orElseThrow(TodoNotFoundException::new);
     }
 
-    public Todo addTodo(Todo todo)
-    {
+    public Todo addTodo(Todo todo) {
         return todoRepository.save(todo);
     }
 
-    public Todo updateTodo(Todo todo)
-    {
+    public Todo updateTodo(Todo todo) {
         getTodoById(todo.getId());
         return todoRepository.save(todo);
     }
 
-    public boolean deleteTodo(UUID id)
-    {
+    public boolean deleteTodo(UUID id) {
         getTodoById(id);
         todoRepository.deleteById(id);
         return true;

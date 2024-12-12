@@ -24,50 +24,45 @@ public class TodoController {
     TodoService todoService;
 
     @GetMapping
-    public ResponseEntity<List<Todo>> getTodos()
-    {
-        return  ResponseEntity.ok(todoService.getTodos());
+    public ResponseEntity<List<Todo>> getTodos() {
+        return ResponseEntity.ok(todoService.getTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Todo> getTodoById(@PathVariable String id)
-    {
-        return  ResponseEntity.ok(todoService.getTodoById(UUID.fromString(id)));
+    public ResponseEntity<Todo> getTodoById(@PathVariable String id) {
+        return ResponseEntity.ok(todoService.getTodoById(UUID.fromString(id)));
     }
 
     @PostMapping
     public ResponseEntity<Todo> addTodos(@Valid @RequestBody Todo todo) throws URISyntaxException {
-        Todo newTodo= todoService.addTodo(todo);
+        Todo newTodo = todoService.addTodo(todo);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newTodo.getId()).toUri();
-        return  ResponseEntity.created(location).body(newTodo);
+        return ResponseEntity.created(location).body(newTodo);
     }
 
     @GetMapping("/users/{user}")
-    public ResponseEntity<List<Todo>> getTodosByUser(@PathVariable String user)
-    {
+    public ResponseEntity<List<Todo>> getTodosByUser(@PathVariable String user) {
         return ResponseEntity.ok(todoService.getTodosByUser(user));
     }
+
     @PutMapping("/{id}")
-    public Todo updateTodo(@PathVariable String id, @Valid @RequestBody Todo todo)
-    {
-        if( UUID.fromString(id).equals(todo.getId()))
-            return  todoService.updateTodo(todo);
+    public Todo updateTodo(@PathVariable String id, @Valid @RequestBody Todo todo) {
+        if (UUID.fromString(id).equals(todo.getId()))
+            return todoService.updateTodo(todo);
         else
             throw new TodoIDMismatchException();
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteTodo(@PathVariable String id)
-    {
-        if( todoService.deleteTodo(UUID.fromString(id))){
+    public ResponseEntity deleteTodo(@PathVariable String id) {
+        if (todoService.deleteTodo(UUID.fromString(id))) {
             return ResponseEntity.noContent().build();
-        }
-        else
-            return  ResponseEntity.notFound().build();
+        } else
+            return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/target/{date}")
-    public ResponseEntity<List<Todo>> getTodosByUser(@PathVariable LocalDate date)
-    {
+    public ResponseEntity<List<Todo>> getTodosByUser(@PathVariable LocalDate date) {
         return ResponseEntity.ok(todoService.getTodosBeforeTargetDate(date));
     }
 }
