@@ -2,6 +2,8 @@ package com.cd.controller;
 
 import com.cd.model.Todo;
 import com.cd.repository.TodoRepository;
+import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional // Ensures database is rolled back after each test
 class TodoControllerIntegrationTest {
 
+    private static String authToken;
     @Autowired
     private MockMvc mockMvc;
-
-
     @Autowired
     private TodoRepository todoRepository;
 
@@ -38,9 +39,40 @@ class TodoControllerIntegrationTest {
         todoRepository.deleteAll();
     }
 
+    @BeforeEach
+    void login() throws Exception {
+        String content = mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "username": "admin",
+                                    "password": "admin"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists())
+                .andReturn().getResponse().getContentAsString();
+        authToken = JsonPath.parse(content).read("$.token");
+        if (authToken == null) {
+            throw new RuntimeException("Auth token is null");
+        }
+    }
+
+    @AfterEach
+    void logout() throws Exception {
+        mockMvc.perform(delete("/logout")
+                        .header("Authorization", "Bearer " + authToken)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").exists())
+                .andExpect(jsonPath("$.status").value("success"));
+        authToken = null;
+    }
+
     @Test
     void testAddTodo_Success() throws Exception {
         mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + authToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -63,6 +95,7 @@ class TodoControllerIntegrationTest {
     @Test
     void testAddTodo_ValidationError() throws Exception {
         mockMvc.perform(post("/todos")
+                        .header("Authorization", "Bearer " + authToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -114,6 +147,7 @@ class TodoControllerIntegrationTest {
 
         // Perform the PUT request to update the Todo
         mockMvc.perform(put("/todos/{id}", savedTodo.getId())
+                        .header("Authorization", "Bearer " + authToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -146,6 +180,7 @@ class TodoControllerIntegrationTest {
         ));
 
         mockMvc.perform(put("/todos/{id}", UUID.randomUUID())
+                        .header("Authorization", "Bearer " + authToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -177,6 +212,7 @@ class TodoControllerIntegrationTest {
 
         // Perform the PUT request with invalid data
         mockMvc.perform(put("/todos/{id}", savedTodo.getId())
+                        .header("Authorization", "Bearer " + authToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -219,7 +255,7 @@ class TodoControllerIntegrationTest {
         ));
 
         mockMvc.perform(get("/todos")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .header("Authorization", "Bearer " + authToken).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2)) // Expect 2 todos
@@ -242,6 +278,7 @@ class TodoControllerIntegrationTest {
                 LocalDate.of(2024, 12, 31)
         ));
         mockMvc.perform(get("/todos/{id}", savedTodo.getId())
+                        .header("Authorization", "Bearer " + authToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(savedTodo.getId().toString()))
@@ -256,7 +293,8 @@ class TodoControllerIntegrationTest {
         // Use a non-existent UUID for the test
         UUID nonExistentId = UUID.randomUUID();
 
-        mockMvc.perform(get("/todos/{id}", nonExistentId))
+        mockMvc.perform(get("/todos/{id}", nonExistentId)
+                        .header("Authorization", "Bearer " + authToken))
                 .andDo(print())  // Print the response to console
                 .andExpect(status().isNotFound())  // Expect 404 Not Found
                 .andExpect(jsonPath("$.errorCode").value("Todo-404"))
@@ -276,7 +314,8 @@ class TodoControllerIntegrationTest {
         ));
 
         // Perform DELETE request
-        mockMvc.perform(delete("/todos/{id}", savedTodo.getId()))
+        mockMvc.perform(delete("/todos/{id}", savedTodo.getId())
+                        .header("Authorization", "Bearer " + authToken))
                 .andExpect(status().isNoContent());
 
         // Verify the Todo no longer exists in the database
@@ -288,7 +327,8 @@ class TodoControllerIntegrationTest {
     void testDeleteTodo_NotFound() throws Exception {
         UUID nonExistentId = UUID.randomUUID();
 
-        mockMvc.perform(delete("/todos/{id}", nonExistentId))
+        mockMvc.perform(delete("/todos/{id}", nonExistentId)
+                        .header("Authorization", "Bearer " + authToken))
                 .andDo(print())  // Print the response to console
                 .andExpect(status().isNotFound())  // Expect 404 Not Found
                 .andExpect(jsonPath("$.errorCode").value("Todo-404"))
