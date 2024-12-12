@@ -2,7 +2,6 @@ package com.cd.controller;
 
 import com.cd.model.Todo;
 import com.cd.repository.TodoRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -38,6 +37,7 @@ class TodoControllerIntegrationTest {
     void clearRepository() {
         todoRepository.deleteAll();
     }
+
     @Test
     void testAddTodo_Success() throws Exception {
         mockMvc.perform(post("/todos")
@@ -89,6 +89,7 @@ class TodoControllerIntegrationTest {
                 .andExpect(jsonPath("$.fieldErrors[?(@.field=='targetDate')].defaultMessage")
                         .value("Target date must be present or future date!"));
     }
+
     @Test
     void testUpdateTodo_Success() throws Exception {
         // Insert a test Todo
@@ -115,15 +116,15 @@ class TodoControllerIntegrationTest {
         mockMvc.perform(put("/todos/{id}", savedTodo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                                "id": "%s",
-                                "user": "User1",
-                                "title": "Title1",
-                                "task": "This is the updated task description.",
-                                "done": true,
-                                "targetDate": "2025-01-01"
-                            }
-                            """.formatted(savedTodo.getId().toString())))
+                                {
+                                    "id": "%s",
+                                    "user": "User1",
+                                    "title": "Title1",
+                                    "task": "This is the updated task description.",
+                                    "done": true,
+                                    "targetDate": "2025-01-01"
+                                }
+                                """.formatted(savedTodo.getId().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(savedTodo.getId().toString()))
                 .andExpect(jsonPath("$.user").value("User1"))
@@ -147,15 +148,15 @@ class TodoControllerIntegrationTest {
         mockMvc.perform(put("/todos/{id}", UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                                "id": "%s",
-                                "user": "User1",
-                                "title": "Title1",
-                                "task": "This is the updated task description.",
-                                "done": true,
-                                "targetDate": "2025-01-01"
-                            }
-                            """.formatted(savedTodo.getId().toString()))) // Passing correct Todo
+                                {
+                                    "id": "%s",
+                                    "user": "User1",
+                                    "title": "Title1",
+                                    "task": "This is the updated task description.",
+                                    "done": true,
+                                    "targetDate": "2025-01-01"
+                                }
+                                """.formatted(savedTodo.getId().toString()))) // Passing correct Todo
                 .andDo(print())
                 .andExpect(status().isBadRequest())  // Expect 400 due to ID mismatch
                 .andExpect(jsonPath("$.errorCode").value("Todo-400"))
@@ -178,15 +179,15 @@ class TodoControllerIntegrationTest {
         mockMvc.perform(put("/todos/{id}", savedTodo.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                                "id": "%s",
-                                "user": "User1",
-                                "title": "T",
-                                "task": "Short",
-                                "done": false,
-                                "targetDate": "2020-01-01"
-                            }
-                            """.formatted(savedTodo.getId().toString())))
+                                {
+                                    "id": "%s",
+                                    "user": "User1",
+                                    "title": "T",
+                                    "task": "Short",
+                                    "done": false,
+                                    "targetDate": "2020-01-01"
+                                }
+                                """.formatted(savedTodo.getId().toString())))
                 .andExpect(status().isBadRequest())
                 // Validate individual field errors
                 .andExpect(jsonPath("$.fieldErrors[?(@.field=='title')].defaultMessage")

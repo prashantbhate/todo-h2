@@ -25,7 +25,7 @@ public class TodoH2Application implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         Todo todo = new Todo();
         todo.setDone(false);
         todo.setUser("Jack");

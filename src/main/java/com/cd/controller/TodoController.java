@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +33,7 @@ public class TodoController {
     }
 
     @PostMapping
-    public ResponseEntity<Todo> addTodos(@Valid @RequestBody Todo todo) throws URISyntaxException {
+    public ResponseEntity<Todo> addTodos(@Valid @RequestBody Todo todo) {
         Todo newTodo = todoService.addTodo(todo);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newTodo.getId()).toUri();
         return ResponseEntity.created(location).body(newTodo);
