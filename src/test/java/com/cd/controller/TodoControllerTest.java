@@ -1,7 +1,5 @@
 package com.cd.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.cd.common.exceptions.TodoIDMismatchException;
 import com.cd.model.Todo;
 import com.cd.service.TodoService;
@@ -19,10 +17,16 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TodoControllerTest {

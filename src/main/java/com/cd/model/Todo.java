@@ -24,8 +24,8 @@ public class Todo {
     @GeneratedValue
     private UUID id;
 
-    @Column(name="todouser")
-    @NotBlank (message = "User cannot be null or empty!")
+    @Column(name = "todouser")
+    @NotBlank(message = "User cannot be null or empty!")
     private String user;
 
     @Size(min = 4, max = 10, message = "Title should be 4 to 10")
